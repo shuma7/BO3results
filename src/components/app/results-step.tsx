@@ -36,7 +36,7 @@ export function generateFormattedOutput(appData: AppData): string {
   if (appData.opponentName.trim()) {
     headingLine += ` vs:${appData.opponentName.trim()}`;
   }
-  let output = `#### ${headingLine}\n`;
+  let output = `### ${headingLine}\n`;
 
 
   output += formatGameDetailForOutput('Ⅰ', appData.game1);
