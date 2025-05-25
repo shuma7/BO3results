@@ -114,17 +114,20 @@ export default function Bo3AssistantPage() {
 
   const userClassesForGame2 = useMemo(() => {
     if (!appData.game1 || appData.userClasses.length !== 2) return [];
-    if (appData.game1.result === '敗北') {
-      return appData.userClasses; 
-    } else { 
+    // If user won game 1, they must play their other class.
+    if (appData.game1.result === '勝利') {
       return appData.userClasses.filter(cls => cls !== appData.game1!.userPlayedClass);
     }
+    // If user lost game 1, they can choose either of their initial classes.
+    return appData.userClasses;
   }, [appData.userClasses, appData.game1]);
 
   const isUserClassFixedForGame2 = useMemo(() => {
-    if (!appData.game1) return true; 
+    if (!appData.game1) return true; // Should not happen if logic is correct
+    // Class is fixed if user won game 1 (must play their other class)
     return appData.game1.result === '勝利';
   }, [appData.game1]);
+
 
   const initialGame2Data = useMemo(() => {
     const baseData = appData.game2 || {};
@@ -135,6 +138,7 @@ export default function Bo3AssistantPage() {
         userPlayedClassForG2 = userClassesForGame2[0];
       }
     } else { 
+      // If user lost G1, class is not fixed, retain previous selection if any
       userPlayedClassForG2 = baseData.userPlayedClass; 
     }
     return { ...baseData, userPlayedClass: userPlayedClassForG2 };
@@ -149,19 +153,19 @@ export default function Bo3AssistantPage() {
       const g1UserWon = appData.game1.result === '勝利';
       const g2UserWon = appData.game2.result === '勝利';
 
-      if (g1UserWon && !g2UserWon) { 
-        userGame3Class = appData.game2.userPlayedClass; 
-        opponentGame3Class = appData.game1.opponentPlayedClass; 
-      } else if (!g1UserWon && g2UserWon) { 
-        userGame3Class = appData.game1.userPlayedClass;
-        opponentGame3Class = appData.game2.opponentPlayedClass;
+      if (g1UserWon && !g2UserWon) { // User won G1, lost G2
+        userGame3Class = appData.game2.userPlayedClass; // Class user lost with in G2
+        opponentGame3Class = appData.game1.opponentPlayedClass; // Class opponent won with in G1 (already banned for G2, must be used in G3 if they play it)
+      } else if (!g1UserWon && g2UserWon) { // User lost G1, won G2
+        userGame3Class = appData.game1.userPlayedClass; // Class user lost with in G1
+        opponentGame3Class = appData.game2.opponentPlayedClass; // Class opponent won with in G2 (already banned for G1, must be used in G3 if they play it)
       }
     }
     return { userGame3Class, opponentGame3Class };
   }, [appData.game1, appData.game2]);
 
   const opponentClassesToDisableForGame2 = useMemo(() => {
-    if (appData.game1 && appData.game1.result === '敗北') { // User lost G1, opponent won G1
+    if (appData.game1 && appData.game1.result === '敗北') { // Opponent won G1
       return [appData.game1.opponentPlayedClass];
     }
     return [];
@@ -197,7 +201,7 @@ export default function Bo3AssistantPage() {
   return (
     <div className="container mx-auto px-4 py-8 flex flex-col items-center min-h-screen">
       <header className="w-full max-w-xl mb-8 text-center">
-        <h1 className="text-3xl font-bold text-primary">Shadowverse BO3 アシスタント</h1>
+        <h1 className="text-3xl font-bold text-primary">BO3results｜YNUsv</h1>
         <p className="text-muted-foreground">BO3の試合結果を簡単に入力・出力できます。</p>
       </header>
 
@@ -283,7 +287,7 @@ export default function Bo3AssistantPage() {
       </main>
       <footer className="text-center py-4 mt-auto text-muted-foreground text-sm">
         {currentYear !== null ? (
-          <p>&copy; {currentYear} Shadowverse BO3 Assistant</p>
+          <p>&copy; {currentYear} BO3results｜YNUsv</p>
         ) : (
           <p>Loading year...</p> 
         )}
@@ -291,3 +295,4 @@ export default function Bo3AssistantPage() {
     </div>
   );
 }
+
