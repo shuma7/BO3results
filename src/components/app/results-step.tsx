@@ -7,12 +7,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import type { AppData, GameDetail, TurnOrder } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { ClipboardCopy, ArrowLeft } from 'lucide-react';
+import { ClipboardCopy, ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
 
 interface ResultsStepProps {
   appData: AppData;
   onBack: () => void;
   onReset: () => void;
+  onNextMatchSameClasses: () => void;
 }
 
 function formatGameDetailForOutput(gameNumSymbol: string, game: GameDetail | null): string {
@@ -29,7 +30,7 @@ function formatGameDetailForOutput(gameNumSymbol: string, game: GameDetail | nul
 }
 
 export function generateFormattedOutput(appData: AppData): string {
-  let output = `${appData.roundNumber}回戦`;
+  let output = `${appData.roundNumber}`; // Removed "回戦" as it's part of the option now
   if (appData.opponentName.trim()) {
     output += `　vs${appData.opponentName.trim()}`;
   }
@@ -48,7 +49,7 @@ export function generateFormattedOutput(appData: AppData): string {
 }
 
 
-export function ResultsStep({ appData, onBack, onReset }: ResultsStepProps) {
+export function ResultsStep({ appData, onBack, onReset, onNextMatchSameClasses }: ResultsStepProps) {
   const { toast } = useToast();
   const formattedOutput = generateFormattedOutput(appData);
 
@@ -79,13 +80,26 @@ export function ResultsStep({ appData, onBack, onReset }: ResultsStepProps) {
           />
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
-          <Button variant="outline" onClick={onBack}><ArrowLeft className="mr-2 h-4 w-4" />入力に戻る</Button>
-          <Button onClick={handleCopyToClipboard}><ClipboardCopy className="mr-2 h-4 w-4" />クリップボードにコピー</Button>
+          <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            入力に戻る
+          </Button>
+          <Button onClick={handleCopyToClipboard} className="w-full sm:w-auto">
+            <ClipboardCopy className="mr-2 h-4 w-4" />
+            クリップボードにコピー
+          </Button>
         </CardFooter>
       </Card>
       
-      <div className="text-center mt-8">
-        <Button variant="ghost" onClick={onReset}>新しいBO3結果を入力する</Button>
+      <div className="text-center mt-6 space-y-3 sm:space-y-0 sm:flex sm:flex-row sm:justify-center sm:gap-4">
+        <Button variant="outline" onClick={onNextMatchSameClasses} className="w-full sm:w-auto">
+          <ArrowRight className="mr-2 h-4 w-4" />
+          次のマッチへ (クラス維持)
+        </Button>
+        <Button variant="ghost" onClick={onReset} className="w-full sm:w-auto">
+          <RefreshCw className="mr-2 h-4 w-4" />
+          新しいBO3結果を入力 (全てリセット)
+        </Button>
       </div>
     </div>
   );

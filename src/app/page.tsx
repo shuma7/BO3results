@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import type { AppData, AppStep, ShadowverseClass, GameDetail, OverallResult, GameResult as GameResultType } from '@/lib/types';
-import { INITIAL_APP_DATA, STEP_TITLES, TOTAL_MAIN_STEPS } from '@/lib/constants';
+import { INITIAL_APP_DATA, STEP_TITLES, TOTAL_MAIN_STEPS, ROUND_OPTIONS } from '@/lib/constants';
 import { ClassSelectionStep } from '@/components/app/class-selection-step';
 import { MatchInfoStep } from '@/components/app/match-info-step';
 import { GameDetailsForm } from '@/components/app/game-details-form';
@@ -26,7 +26,7 @@ export default function Bo3AssistantPage() {
   }, []);
 
   const handleClassesSelect = (classes: [ShadowverseClass, ShadowverseClass]) => {
-    updateAppData({ userClasses: classes });
+    updateAppData({ userClasses: classes, roundNumber: ROUND_OPTIONS[0] });
     setCurrentStep('MATCH_INFO');
   };
 
@@ -67,8 +67,7 @@ export default function Bo3AssistantPage() {
       updateAppData({ game2: details, overallResult });
       setCurrentStep('RESULTS');
     } else {
-      // Need Game 3
-      updateAppData({ game2: details, overallResult: '' }); // Reset overallResult if it was prematurely set
+      updateAppData({ game2: details, overallResult: '' }); 
       setCurrentStep('GAME_3_DETAILS');
     }
   };
@@ -96,14 +95,50 @@ export default function Bo3AssistantPage() {
     setAppData(INITIAL_APP_DATA);
     setCurrentStep('CLASS_SELECTION');
   };
+
+  const handleGoToNextMatchSameClasses = () => {
+    setAppData(prev => ({
+      ...INITIAL_APP_DATA, // Resets game-specific data, opponent name, etc.
+      userClasses: prev.userClasses, // Keeps the selected classes
+      roundNumber: ROUND_OPTIONS[0], // Reset roundNumber to the first default option
+    }));
+    setCurrentStep('MATCH_INFO');
+  };
   
   const userClassForGame1 = appData.userClasses;
-  const userClassForGame2 = useMemo(() => {
-    if (appData.userClasses.length === 2 && appData.game1?.userPlayedClass) {
+
+  const userClassesForGame2 = useMemo(() => {
+    if (!appData.game1 || appData.userClasses.length !== 2) return [];
+    if (appData.game1.result === '敗北') {
+      // User lost Game 1, can play either of their initial two classes
+      return appData.userClasses; 
+    } else { 
+      // User won Game 1, must play the other class
       return appData.userClasses.filter(cls => cls !== appData.game1!.userPlayedClass);
     }
-    return [];
   }, [appData.userClasses, appData.game1]);
+
+  const isUserClassFixedForGame2 = useMemo(() => {
+    if (!appData.game1) return true; // Default, though G1 must be played first
+    // Class is fixed if user won Game 1 (must play other class)
+    // Class is NOT fixed if user lost Game 1 (can choose either)
+    return appData.game1.result === '勝利';
+  }, [appData.game1]);
+
+  const initialGame2Data = useMemo(() => {
+    const baseData = appData.game2 || {};
+    let userPlayedClassForG2: ShadowverseClass | undefined = undefined;
+
+    if (isUserClassFixedForGame2) { // User won G1
+      if (userClassesForGame2.length === 1) {
+        userPlayedClassForG2 = userClassesForGame2[0];
+      }
+    } else { // User lost G1, class is not fixed
+      userPlayedClassForG2 = baseData.userPlayedClass; // Retain if navigating back
+    }
+    return { ...baseData, userPlayedClass: userPlayedClassForG2 };
+  }, [appData.game2, isUserClassFixedForGame2, userClassesForGame2]);
+
 
   const classesForGame3 = useMemo(() => {
     let userGame3Class: ShadowverseClass | undefined = undefined;
@@ -114,8 +149,8 @@ export default function Bo3AssistantPage() {
       const g2UserWon = appData.game2.result === '勝利';
 
       if (g1UserWon && !g2UserWon) { // User won G1, lost G2
-        userGame3Class = appData.game2.userPlayedClass; // User plays class they lost with
-        opponentGame3Class = appData.game1.opponentPlayedClass; // Opponent plays class they lost with
+        userGame3Class = appData.game2.userPlayedClass; 
+        opponentGame3Class = appData.game1.opponentPlayedClass; 
       } else if (!g1UserWon && g2UserWon) { // User lost G1, won G2
         userGame3Class = appData.game1.userPlayedClass;
         opponentGame3Class = appData.game2.opponentPlayedClass;
@@ -187,13 +222,13 @@ export default function Bo3AssistantPage() {
             onBack={goBack}
           />
         )}
-        {currentStep === 'GAME_2_DETAILS' && userClassForGame2.length > 0 && (
+        {currentStep === 'GAME_2_DETAILS' && userClassesForGame2.length > 0 && (
           <GameDetailsForm
             gameNumber={2}
             title={STEP_TITLES.GAME_2_DETAILS}
-            initialData={appData.game2 || { userPlayedClass: userClassForGame2[0] }}
-            userAvailableClasses={userClassForGame2}
-            isUserClassFixed={true}
+            initialData={initialGame2Data}
+            userAvailableClasses={userClassesForGame2}
+            isUserClassFixed={isUserClassFixedForGame2}
             isOpponentClassFixed={false}
             onSubmit={handleGame2Submit}
             onBack={goBack}
@@ -212,7 +247,12 @@ export default function Bo3AssistantPage() {
           />
         )}
         {currentStep === 'RESULTS' && (
-          <ResultsStep appData={appData} onBack={goBack} onReset={handleReset} />
+          <ResultsStep 
+            appData={appData} 
+            onBack={goBack} 
+            onReset={handleReset}
+            onNextMatchSameClasses={handleGoToNextMatchSameClasses} 
+          />
         )}
       </main>
       <footer className="text-center py-4 mt-auto text-muted-foreground text-sm">

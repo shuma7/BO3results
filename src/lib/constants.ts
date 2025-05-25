@@ -1,5 +1,5 @@
 
-import type { ShadowverseClass, TurnOrder, GameResult } from './types';
+import type { ShadowverseClass, TurnOrder, GameResult, AppData, AppStep } from './types';
 
 export const ALL_SHADOWVERSE_CLASSES: ShadowverseClass[] = [
   'エルフ',
@@ -14,9 +14,14 @@ export const ALL_SHADOWVERSE_CLASSES: ShadowverseClass[] = [
 export const TURN_ORDERS: TurnOrder[] = ['先攻', '後攻'];
 export const GAME_RESULTS: GameResult[] = ['勝利', '敗北'];
 
+export const ROUND_OPTIONS: string[] = [
+  '1回戦', '2回戦', '3回戦', '4回戦', '5回戦', 
+  '準々決勝', '準決勝', '決勝', 'その他'
+];
+
 export const INITIAL_APP_DATA: AppData = {
   userClasses: [],
-  roundNumber: '1',
+  roundNumber: ROUND_OPTIONS[0], // Default to the first option
   opponentName: '',
   game1: null,
   game2: null,
@@ -36,3 +41,4 @@ export const STEP_TITLES: Record<AppStep, string> = {
 export const TOTAL_MAIN_STEPS = 4; // Class Selection, Match Info, Game 1, Game 2. Results is the end. Game 3 is conditional.
                                 // This helps with progress bar logic for the main flow.
                                 // Actual progress mapping will be more nuanced.
+

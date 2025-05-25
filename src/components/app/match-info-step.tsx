@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import type { AppData } from '@/lib/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ROUND_OPTIONS } from '@/lib/constants';
 
 interface MatchInfoStepProps {
   roundNumber: string;
@@ -34,13 +35,16 @@ export function MatchInfoStep({
       <CardContent className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="roundNumber">何回戦</Label>
-          <Input
-            id="roundNumber"
-            type="text" // Kept as text to allow "決勝" etc. User request implies number, but example shows "4回戦"
-            value={roundNumber}
-            onChange={e => setRoundNumber(e.target.value)}
-            placeholder="例: 1回戦, 準決勝"
-          />
+          <Select value={roundNumber} onValueChange={setRoundNumber}>
+            <SelectTrigger id="roundNumber">
+              <SelectValue placeholder="回戦を選択" />
+            </SelectTrigger>
+            <SelectContent>
+              {ROUND_OPTIONS.map(option => (
+                <SelectItem key={option} value={option}>{option}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label htmlFor="opponentName">相手の名前 (スキップ可)</Label>
