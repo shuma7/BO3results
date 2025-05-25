@@ -9,7 +9,7 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  basePath: '/BO3results-YNUsv',
   typescript: {
     ignoreBuildErrors: true,
   },
