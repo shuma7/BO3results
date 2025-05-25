@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import type { AppData, GameDetail, TurnOrder } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { ClipboardCopy, ArrowLeft } from 'lucide-react';
-import { AiMessageSuggester } from './ai-message-suggester';
 
 interface ResultsStepProps {
   appData: AppData;
@@ -85,8 +84,6 @@ export function ResultsStep({ appData, onBack, onReset }: ResultsStepProps) {
         </CardFooter>
       </Card>
       
-      <AiMessageSuggester appData={appData} />
-
       <div className="text-center mt-8">
         <Button variant="ghost" onClick={onReset}>新しいBO3結果を入力する</Button>
       </div>

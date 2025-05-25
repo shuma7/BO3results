@@ -29,21 +29,3 @@ export type AppStep =
   | 'GAME_2_DETAILS'
   | 'GAME_3_DETAILS' // Conditionally shown
   | 'RESULTS';
-
-// AI Types
-export type AiMatchResult = 'win' | 'loss';
-export type AiTurnOrder = 'first' | 'second';
-
-export interface AiGameDetail {
-  userClass: string;
-  opponentClass: string;
-  turnOrder: AiTurnOrder;
-  gameResult: AiMatchResult;
-}
-
-export interface AiSuggestPostMatchMessageInput {
-  matchResult: AiMatchResult;
-  opponentName?: string;
-  userNotes: string;
-  gameDetails: AiGameDetail[];
-}
