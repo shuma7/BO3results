@@ -11,11 +11,12 @@ export const ALL_SHADOWVERSE_CLASSES: ShadowverseClass[] = [
   'ネメシス',
 ];
 
-export const TURN_ORDERS: TurnOrder[] = ['先攻', '後攻'];
+export const TURN_ORDERS: TurnOrder[] = ['先', '後'];
 export const GAME_RESULTS: GameResult[] = ['勝利', '敗北'];
 
 export const ROUND_OPTIONS: string[] = [
   '1回戦', '2回戦', '3回戦', '4回戦', '5回戦', 
+  '6回戦', '7回戦', '8回戦', '9回戦',
   '準々決勝', '準決勝', '決勝', 'その他'
 ];
 

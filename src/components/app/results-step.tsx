@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import type { AppData, GameDetail, TurnOrder } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { ClipboardCopy, ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
+// import { AiMessageSuggester } from './ai-message-suggester'; // AI機能削除のためコメントアウト
 
 interface ResultsStepProps {
   appData: AppData;
@@ -20,7 +21,7 @@ function formatGameDetailForOutput(gameNumSymbol: string, game: GameDetail | nul
   if (!game) return "";
   const userResultIcon = game.result === '勝利' ? '○' : '✕';
   const opponentResultIcon = game.result === '勝利' ? '✕' : '○';
-  const opponentTurnOrder: TurnOrder = game.turnOrder === '先攻' ? '後攻' : '先攻';
+  const opponentTurnOrder: TurnOrder = game.turnOrder === '先' ? '後' : '先';
 
   let output = `${gameNumSymbol} ${game.turnOrder}:${game.userPlayedClass} ${userResultIcon}ｰ${opponentResultIcon} ${opponentTurnOrder}:${game.opponentPlayedClass}\n`;
   if (game.memo.trim()) {
@@ -32,7 +33,7 @@ function formatGameDetailForOutput(gameNumSymbol: string, game: GameDetail | nul
 export function generateFormattedOutput(appData: AppData): string {
   let output = `${appData.roundNumber}`;
   if (appData.opponentName.trim()) {
-    output += `　vs${appData.opponentName.trim()}`;
+    output += `　vs:${appData.opponentName.trim()}`;
   }
   output += '\n';
 
@@ -91,6 +92,10 @@ export function ResultsStep({ appData, onBack, onReset, onNextMatchSameClasses }
         </CardFooter>
       </Card>
       
+      {/* AI機能削除のためコメントアウト
+      <AiMessageSuggester appData={appData} /> 
+      */}
+      
       <div className="text-center mt-6 space-y-3 sm:space-y-0 sm:flex sm:flex-row sm:justify-center sm:gap-4">
         <Button variant="outline" onClick={onNextMatchSameClasses} className="w-full sm:w-auto">
           <ArrowRight className="mr-2 h-4 w-4" />
@@ -104,4 +109,3 @@ export function ResultsStep({ appData, onBack, onReset, onNextMatchSameClasses }
     </div>
   );
 }
-

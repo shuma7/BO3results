@@ -1,6 +1,6 @@
 
 export type ShadowverseClass = 'エルフ' | 'ロイヤル' | 'ドラゴン' | 'ウィッチ' | 'ナイトメア' | 'ビショップ' | 'ネメシス';
-export type TurnOrder = '先攻' | '後攻';
+export type TurnOrder = '先' | '後';
 export type GameResult = '勝利' | '敗北';
 export type OverallResult = '勝利' | '敗北' | '';
 
@@ -29,3 +29,21 @@ export type AppStep =
   | 'GAME_2_DETAILS'
   | 'GAME_3_DETAILS' // Conditionally shown
   | 'RESULTS';
+
+// Types for AI message suggestion (currently removed, but kept for potential future use or reference)
+// export type AiMatchResult = 'win' | 'loss';
+// export type AiTurnOrder = 'first' | 'second';
+
+// export interface AiGameDetail {
+//   userClass: ShadowverseClass;
+//   opponentClass: ShadowverseClass;
+//   turnOrder: AiTurnOrder;
+//   gameResult: AiMatchResult;
+// }
+
+// export interface AiSuggestPostMatchMessageInput {
+//   matchResult: AiMatchResult;
+//   opponentName?: string;
+//   userNotes: string;
+//   gameDetails: AiGameDetail[];
+// }
