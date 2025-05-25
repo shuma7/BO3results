@@ -6,7 +6,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Shadowverse BO3 Assistant',
+  title: 'BO3results｜YNUsv',
   description: 'BO3試合結果テキスト出力アプリ',
 };
 

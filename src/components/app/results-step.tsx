@@ -36,10 +36,10 @@ export function generateFormattedOutput(appData: AppData): string {
   }
   output += '\n';
 
-  output += formatGameDetailForOutput('I', appData.game1);
-  output += formatGameDetailForOutput('II', appData.game2);
+  output += formatGameDetailForOutput('i', appData.game1);
+  output += formatGameDetailForOutput('ii', appData.game2);
   if (appData.game3) {
-    output += formatGameDetailForOutput('III', appData.game3);
+    output += formatGameDetailForOutput('iii', appData.game3);
   }
 
   if (appData.overallResult) {
