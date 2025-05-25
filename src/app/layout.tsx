@@ -1,14 +1,14 @@
 
 import type { Metadata } from 'next';
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
+import { GeistSans } from 'geist/font';
+import { GeistMono } from 'geist/font';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: 'BO3results｜YNUsv',
   description: 'BO3試合結果テキスト出力アプリ',
-  manifest: '/manifest.json', // Added manifest link
+  manifest: '/BO3results-YNUsv/manifest.json', // Updated manifest path
 };
 
 export default function RootLayout({
