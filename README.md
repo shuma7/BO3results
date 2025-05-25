@@ -1,4 +1,4 @@
-# Firebase Studio
+# BO3results｜YNUsv
 
 This is a NextJS starter in Firebase Studio.
 
