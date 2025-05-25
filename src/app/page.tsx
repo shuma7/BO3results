@@ -60,7 +60,7 @@ export default function Bo3AssistantPage() {
   };
 
   const handleGame2Submit = (details: GameDetail) => {
-    const newAppData = { ...appData, game2: details };
+    const newAppData = { ...appData, game1: appData.game1, game2: details }; // Ensure game1 is also included
     const overallResult = calculateOverallResult(newAppData.game1?.result ?? null, details.result);
     
     if (overallResult === '勝利' || overallResult === '敗北') {
@@ -98,30 +98,26 @@ export default function Bo3AssistantPage() {
 
   const handleGoToNextMatchSameClasses = () => {
     setAppData(prev => ({
-      ...INITIAL_APP_DATA, // Resets game-specific data, opponent name, etc.
-      userClasses: prev.userClasses, // Keeps the selected classes
-      roundNumber: ROUND_OPTIONS[0], // Reset roundNumber to the first default option
+      ...INITIAL_APP_DATA, 
+      userClasses: prev.userClasses, 
+      roundNumber: ROUND_OPTIONS[0], 
     }));
     setCurrentStep('MATCH_INFO');
   };
   
-  const userClassForGame1 = appData.userClasses;
+  const userClassesForGame1 = appData.userClasses;
 
   const userClassesForGame2 = useMemo(() => {
     if (!appData.game1 || appData.userClasses.length !== 2) return [];
     if (appData.game1.result === '敗北') {
-      // User lost Game 1, can play either of their initial two classes
       return appData.userClasses; 
     } else { 
-      // User won Game 1, must play the other class
       return appData.userClasses.filter(cls => cls !== appData.game1!.userPlayedClass);
     }
   }, [appData.userClasses, appData.game1]);
 
   const isUserClassFixedForGame2 = useMemo(() => {
-    if (!appData.game1) return true; // Default, though G1 must be played first
-    // Class is fixed if user won Game 1 (must play other class)
-    // Class is NOT fixed if user lost Game 1 (can choose either)
+    if (!appData.game1) return true; 
     return appData.game1.result === '勝利';
   }, [appData.game1]);
 
@@ -129,12 +125,12 @@ export default function Bo3AssistantPage() {
     const baseData = appData.game2 || {};
     let userPlayedClassForG2: ShadowverseClass | undefined = undefined;
 
-    if (isUserClassFixedForGame2) { // User won G1
+    if (isUserClassFixedForGame2) { 
       if (userClassesForGame2.length === 1) {
         userPlayedClassForG2 = userClassesForGame2[0];
       }
-    } else { // User lost G1, class is not fixed
-      userPlayedClassForG2 = baseData.userPlayedClass; // Retain if navigating back
+    } else { 
+      userPlayedClassForG2 = baseData.userPlayedClass; 
     }
     return { ...baseData, userPlayedClass: userPlayedClassForG2 };
   }, [appData.game2, isUserClassFixedForGame2, userClassesForGame2]);
@@ -148,15 +144,35 @@ export default function Bo3AssistantPage() {
       const g1UserWon = appData.game1.result === '勝利';
       const g2UserWon = appData.game2.result === '勝利';
 
-      if (g1UserWon && !g2UserWon) { // User won G1, lost G2
+      if (g1UserWon && !g2UserWon) { 
         userGame3Class = appData.game2.userPlayedClass; 
         opponentGame3Class = appData.game1.opponentPlayedClass; 
-      } else if (!g1UserWon && g2UserWon) { // User lost G1, won G2
+      } else if (!g1UserWon && g2UserWon) { 
         userGame3Class = appData.game1.userPlayedClass;
         opponentGame3Class = appData.game2.opponentPlayedClass;
       }
     }
     return { userGame3Class, opponentGame3Class };
+  }, [appData.game1, appData.game2]);
+
+  const opponentClassesToDisableForGame2 = useMemo(() => {
+    if (appData.game1 && appData.game1.result === '敗北') { // User lost G1, opponent won G1
+      return [appData.game1.opponentPlayedClass];
+    }
+    return [];
+  }, [appData.game1]);
+
+  const opponentClassesToDisableForGame3 = useMemo(() => {
+    const disabled: ShadowverseClass[] = [];
+    if (appData.game1 && appData.game1.result === '敗北') { // Opponent won G1
+      disabled.push(appData.game1.opponentPlayedClass);
+    }
+    if (appData.game2 && appData.game2.result === '敗北') { // Opponent won G2
+      if (!disabled.includes(appData.game2.opponentPlayedClass)) {
+        disabled.push(appData.game2.opponentPlayedClass);
+      }
+    }
+    return disabled;
   }, [appData.game1, appData.game2]);
 
 
@@ -215,9 +231,10 @@ export default function Bo3AssistantPage() {
             gameNumber={1}
             title={STEP_TITLES.GAME_1_DETAILS}
             initialData={appData.game1 || {}}
-            userAvailableClasses={userClassForGame1}
+            userAvailableClasses={userClassesForGame1}
             isUserClassFixed={false}
             isOpponentClassFixed={false}
+            opponentClassesToDisable={[]} // No restrictions for G1 opponent
             onSubmit={handleGame1Submit}
             onBack={goBack}
           />
@@ -230,6 +247,7 @@ export default function Bo3AssistantPage() {
             userAvailableClasses={userClassesForGame2}
             isUserClassFixed={isUserClassFixedForGame2}
             isOpponentClassFixed={false}
+            opponentClassesToDisable={opponentClassesToDisableForGame2}
             onSubmit={handleGame2Submit}
             onBack={goBack}
           />
@@ -242,6 +260,7 @@ export default function Bo3AssistantPage() {
             userAvailableClasses={classesForGame3.userGame3Class ? [classesForGame3.userGame3Class] : []}
             isUserClassFixed={true}
             isOpponentClassFixed={true}
+            opponentClassesToDisable={opponentClassesToDisableForGame3} // Opponent class is fixed, but pass for consistency
             onSubmit={handleGame3Submit}
             onBack={goBack}
           />

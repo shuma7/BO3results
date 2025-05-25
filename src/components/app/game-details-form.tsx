@@ -12,16 +12,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input'; // Added import
+import { Input } from '@/components/ui/input';
 
 interface GameDetailsFormProps {
   gameNumber: 1 | 2 | 3;
   initialData: Partial<GameDetail>;
-  userAvailableClasses: ShadowverseClass[]; // For game 1, it's the two selected. For game 2, the remaining one. For game 3, auto-selected.
-  isUserClassFixed: boolean; // True for game 2 and 3
-  isOpponentClassFixed: boolean; // True for game 3
+  userAvailableClasses: ShadowverseClass[];
+  isUserClassFixed: boolean;
+  isOpponentClassFixed: boolean;
+  opponentClassesToDisable?: ShadowverseClass[]; // Classes opponent won with in previous games
   onSubmit: (details: GameDetail) => void;
-  onBack?: () => void; // Optional: only for game 1
+  onBack?: () => void;
   title: string;
 }
 
@@ -31,6 +32,7 @@ export function GameDetailsForm({
   userAvailableClasses,
   isUserClassFixed,
   isOpponentClassFixed,
+  opponentClassesToDisable = [],
   onSubmit,
   onBack,
   title,
@@ -114,7 +116,13 @@ export function GameDetailsForm({
               </SelectTrigger>
               <SelectContent>
                 {ALL_SHADOWVERSE_CLASSES.map(cls => (
-                  <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+                  <SelectItem 
+                    key={cls} 
+                    value={cls}
+                    disabled={opponentClassesToDisable.includes(cls)}
+                  >
+                    {cls}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -163,7 +171,7 @@ export function GameDetailsForm({
             id={`memo-${gameNumber}`}
             value={memo}
             onChange={e => setMemo(e.target.value)}
-            placeholder="例: 相手のアーキタイプはランプ。序盤の攻めに対応しきれなかった。"
+            placeholder="相手デッキのアーキタイプ、進行･分岐、反省など"
             rows={3}
           />
         </div>
@@ -171,7 +179,7 @@ export function GameDetailsForm({
       <CardFooter className={`flex ${onBack ? 'justify-between' : 'justify-end'}`}>
         {onBack && <Button variant="outline" onClick={onBack}>戻る</Button>}
         <Button onClick={handleSubmit}>
-          {gameNumber === 3 || (gameNumber === 2 && result) ? "結果を確認する" : "次の試合へ"}
+          {gameNumber === 3 || (gameNumber === 2 && result && (appData.overallResult === '勝利' || appData.overallResult === '敗北') ) ? "結果を確認する" : "次の試合へ"}
         </Button>
       </CardFooter>
     </Card>

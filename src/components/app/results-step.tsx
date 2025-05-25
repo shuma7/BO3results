@@ -30,16 +30,16 @@ function formatGameDetailForOutput(gameNumSymbol: string, game: GameDetail | nul
 }
 
 export function generateFormattedOutput(appData: AppData): string {
-  let output = `${appData.roundNumber}`; // Removed "回戦" as it's part of the option now
+  let output = `${appData.roundNumber}`;
   if (appData.opponentName.trim()) {
     output += `　vs${appData.opponentName.trim()}`;
   }
   output += '\n';
 
-  output += formatGameDetailForOutput('①', appData.game1);
-  output += formatGameDetailForOutput('②', appData.game2);
+  output += formatGameDetailForOutput('I', appData.game1);
+  output += formatGameDetailForOutput('II', appData.game2);
   if (appData.game3) {
-    output += formatGameDetailForOutput('③', appData.game3);
+    output += formatGameDetailForOutput('III', appData.game3);
   }
 
   if (appData.overallResult) {
