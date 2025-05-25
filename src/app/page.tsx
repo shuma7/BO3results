@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState, useMemo, useCallback } from 'react';
-import type { AppData, AppStep, ShadowverseClass, GameDetail, OverallResult } from '@/lib/types';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import type { AppData, AppStep, ShadowverseClass, GameDetail, OverallResult, GameResult as GameResultType } from '@/lib/types';
 import { INITIAL_APP_DATA, STEP_TITLES, TOTAL_MAIN_STEPS } from '@/lib/constants';
 import { ClassSelectionStep } from '@/components/app/class-selection-step';
 import { MatchInfoStep } from '@/components/app/match-info-step';
@@ -15,6 +15,11 @@ import { RefreshCw } from 'lucide-react';
 export default function Bo3AssistantPage() {
   const [currentStep, setCurrentStep] = useState<AppStep>('CLASS_SELECTION');
   const [appData, setAppData] = useState<AppData>(INITIAL_APP_DATA);
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   const updateAppData = useCallback((updates: Partial<AppData>) => {
     setAppData(prev => ({ ...prev, ...updates }));
@@ -29,7 +34,7 @@ export default function Bo3AssistantPage() {
     setCurrentStep('GAME_1_DETAILS');
   };
 
-  const calculateOverallResult = (game1Res: GameResult | null, game2Res: GameResult | null, game3Res?: GameResult | null): OverallResult => {
+  const calculateOverallResult = (game1Res: GameResultType | null, game2Res: GameResultType | null, game3Res?: GameResultType | null): OverallResult => {
     if (!game1Res || !game2Res) return '';
     
     let userWins = 0;
@@ -211,9 +216,12 @@ export default function Bo3AssistantPage() {
         )}
       </main>
       <footer className="text-center py-4 mt-auto text-muted-foreground text-sm">
-        <p>&copy; {new Date().getFullYear()} Shadowverse BO3 Assistant</p>
+        {currentYear !== null ? (
+          <p>&copy; {currentYear} Shadowverse BO3 Assistant</p>
+        ) : (
+          <p>Loading year...</p> 
+        )}
       </footer>
     </div>
   );
 }
-
