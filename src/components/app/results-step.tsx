@@ -21,23 +21,23 @@ function formatGameDetailForOutput(gameNumSymbol: string, game: GameDetail | nul
   const userResultIcon = game.result === '勝利' ? '○' : '✕';
   const opponentResultIcon = game.result === '勝利' ? '✕' : '○';
   
-  // Ensure turn orders are correctly mapped if they were '先攻'/'後攻' before
-  const displayTurnOrder = game.turnOrder === '先' ? '先' : '後';
+  const displayTurnOrder = game.turnOrder; // Already '先' or '後'
   const displayOpponentTurnOrder: TurnOrder = displayTurnOrder === '先' ? '後' : '先';
 
   let output = `${gameNumSymbol} ${displayTurnOrder}:${game.userPlayedClass} ${userResultIcon}ｰ${opponentResultIcon} ${displayOpponentTurnOrder}:${game.opponentPlayedClass}\n`;
   if (game.memo.trim()) {
-    output += `${game.memo.trim()}\n`; // Removed indentation here
+    output += `${game.memo.trim()}\n`;
   }
   return output;
 }
 
 export function generateFormattedOutput(appData: AppData): string {
-  let output = `${appData.roundNumber}`;
+  let headingLine = appData.roundNumber;
   if (appData.opponentName.trim()) {
-    output += `　vs:${appData.opponentName.trim()}`;
+    headingLine += ` vs:${appData.opponentName.trim()}`;
   }
-  output += '\n';
+  let output = `#### ${headingLine}\n`;
+
 
   output += formatGameDetailForOutput('Ⅰ', appData.game1);
   output += formatGameDetailForOutput('Ⅱ', appData.game2);
@@ -107,4 +107,3 @@ export function ResultsStep({ appData, onBack, onReset, onNextMatchSameClasses }
     </div>
   );
 }
-
