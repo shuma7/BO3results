@@ -60,7 +60,7 @@ export default function Bo3AssistantPage() {
   };
 
   const handleGame2Submit = (details: GameDetail) => {
-    const newAppData = { ...appData, game1: appData.game1, game2: details }; // Ensure game1 is also included
+    const newAppData = { ...appData, game1: appData.game1, game2: details }; 
     const overallResult = calculateOverallResult(newAppData.game1?.result ?? null, details.result);
     
     if (overallResult === '勝利' || overallResult === '敗北') {
@@ -97,10 +97,15 @@ export default function Bo3AssistantPage() {
   };
 
   const handleGoToNextMatchSameClasses = () => {
+    const currentRoundIndex = ROUND_OPTIONS.indexOf(appData.roundNumber);
+    const nextRoundIndex = (currentRoundIndex + 1) % ROUND_OPTIONS.length;
+    const nextRoundNumber = ROUND_OPTIONS[nextRoundIndex === ROUND_OPTIONS.length -1 && currentRoundIndex !== ROUND_OPTIONS.length -2 ? 0 : nextRoundIndex];
+
+
     setAppData(prev => ({
       ...INITIAL_APP_DATA, 
       userClasses: prev.userClasses, 
-      roundNumber: ROUND_OPTIONS[0], 
+      roundNumber: nextRoundNumber,
     }));
     setCurrentStep('MATCH_INFO');
   };
@@ -234,7 +239,7 @@ export default function Bo3AssistantPage() {
             userAvailableClasses={userClassesForGame1}
             isUserClassFixed={false}
             isOpponentClassFixed={false}
-            opponentClassesToDisable={[]} // No restrictions for G1 opponent
+            opponentClassesToDisable={[]} 
             onSubmit={handleGame1Submit}
             onBack={goBack}
           />
@@ -250,6 +255,7 @@ export default function Bo3AssistantPage() {
             opponentClassesToDisable={opponentClassesToDisableForGame2}
             onSubmit={handleGame2Submit}
             onBack={goBack}
+            currentOverallResult={appData.overallResult}
           />
         )}
         {currentStep === 'GAME_3_DETAILS' && classesForGame3.userGame3Class && classesForGame3.opponentGame3Class && (
@@ -260,9 +266,10 @@ export default function Bo3AssistantPage() {
             userAvailableClasses={classesForGame3.userGame3Class ? [classesForGame3.userGame3Class] : []}
             isUserClassFixed={true}
             isOpponentClassFixed={true}
-            opponentClassesToDisable={opponentClassesToDisableForGame3} // Opponent class is fixed, but pass for consistency
+            opponentClassesToDisable={opponentClassesToDisableForGame3}
             onSubmit={handleGame3Submit}
             onBack={goBack}
+            currentOverallResult={appData.overallResult}
           />
         )}
         {currentStep === 'RESULTS' && (

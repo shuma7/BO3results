@@ -3,7 +3,7 @@
 
 import type React from 'react';
 import { useState, useEffect } from 'react';
-import type { GameDetail, ShadowverseClass, TurnOrder, GameResult } from '@/lib/types';
+import type { GameDetail, ShadowverseClass, TurnOrder, GameResult, OverallResult } from '@/lib/types';
 import { ALL_SHADOWVERSE_CLASSES, TURN_ORDERS, GAME_RESULTS } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,7 @@ interface GameDetailsFormProps {
   onSubmit: (details: GameDetail) => void;
   onBack?: () => void;
   title: string;
+  currentOverallResult?: OverallResult; // Added prop
 }
 
 export function GameDetailsForm({
@@ -36,6 +37,7 @@ export function GameDetailsForm({
   onSubmit,
   onBack,
   title,
+  currentOverallResult, // Destructure new prop
 }: GameDetailsFormProps) {
   const [userPlayedClass, setUserPlayedClass] = useState<ShadowverseClass | undefined>(
     initialData.userPlayedClass || (isUserClassFixed && userAvailableClasses.length > 0 ? userAvailableClasses[0] : undefined)
@@ -179,7 +181,7 @@ export function GameDetailsForm({
       <CardFooter className={`flex ${onBack ? 'justify-between' : 'justify-end'}`}>
         {onBack && <Button variant="outline" onClick={onBack}>戻る</Button>}
         <Button onClick={handleSubmit}>
-          {gameNumber === 3 || (gameNumber === 2 && result && (appData.overallResult === '勝利' || appData.overallResult === '敗北') ) ? "結果を確認する" : "次の試合へ"}
+          {gameNumber === 3 || (gameNumber === 2 && result && (currentOverallResult === '勝利' || currentOverallResult === '敗北') ) ? "結果を確認する" : "次の試合へ"}
         </Button>
       </CardFooter>
     </Card>
